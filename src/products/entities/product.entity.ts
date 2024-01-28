@@ -29,6 +29,9 @@ export class Product extends GenericEntity {
   @Column()
   color: string;
 
+  @Column()
+  rating: number;
+
   @OneToMany(() => CustomerProduct, (customerProduct) => customerProduct.id)
   consumerProduct: CustomerProduct[];
 

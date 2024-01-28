@@ -9,7 +9,7 @@ export class CustomerProduct extends GenericEntity {
   rating: number;
 
   @Column()
-  Wishlisted: boolean;
+  wishlisted: boolean;
 
   @ManyToOne(() => Product, (product) => product.id)
   product: Product;
