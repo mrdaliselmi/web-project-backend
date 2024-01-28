@@ -1,5 +1,7 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { GenericEntity } from 'src/common/generic.entity';
+import { CustomerProduct } from 'src/customer-product/entities/customer-product.entity';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Entity()
 export class UserEntity extends GenericEntity {
@@ -14,4 +16,10 @@ export class UserEntity extends GenericEntity {
 
   @Column()
   salt: string;
+
+  @OneToMany(() => CustomerProduct, (customerProduct) => customerProduct.id)
+  customerProduct: CustomerProduct[];
+
+  @OneToMany(() => Order, (order) => order.id)
+  order: Order[];
 }
