@@ -8,29 +8,47 @@ export class Product extends GenericEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   price: number;
 
-  @Column()
-  imageUrl: string;
+  @Column({ nullable: true })
+  originalPrice: number;
 
-  @Column()
+  @Column({ nullable: true, default: '[]' })
+  images: string;
+
+  @Column({ nullable: true })
   stock: number;
 
-  @Column()
+  @Column({ nullable: true })
   category: string;
 
-  @Column()
+  @Column({ nullable: true })
   brand: string;
 
-  @Column()
-  color: string;
+  @Column({ nullable: true, default: '[]' })
+  colors: string;
 
-  @Column()
+  @Column({ nullable: true })
   rating: number;
+
+  @Column('simple-json', { nullable: true })
+  specs: {
+    type: string | null;
+    numberOfKeys: number;
+    keyCaps: string;
+    illumination: string;
+    buttons: number;
+    resolution: string;
+    headSupport: string;
+    size: string;
+    upholstery: string;
+    material: string;
+    connectivity: string;
+  };
 
   @OneToMany(() => CustomerProduct, (customerProduct) => customerProduct.id)
   consumerProduct: CustomerProduct[];

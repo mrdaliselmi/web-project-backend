@@ -20,29 +20,34 @@ export class AuthService {
     user.username = username;
     user.salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(password, user.salt);
-    const result = await this.userService.create(user);
-    return {
-      id: result.id,
-      username: result.username,
-      email: result.email,
-    };
+    try {
+      const result = await this.userService.create(user);
+      return {
+        id: result.id,
+        username: result.username,
+        email: result.email,
+      };
+    } catch (error) {
+      throw new BadRequestException('username or email already exists');
+    }
   }
   async signIn(loginData: SignInDto) {
     const { email, password } = loginData;
     const user = await this.userService.findUserByCredential(email);
-
-    const hashedPassword = await bcrypt.hash(password, user.salt);
-    if (user && hashedPassword === user.password) {
-      const payload = { username: user.username, id: user.id };
-      return {
-        user: {
-          username: user.username,
-          email: user.email,
-          id: user.id,
-        },
-        access_token: this.jwtService.sign(payload),
-      };
-    } else {
+    try {
+      const hashedPassword = await bcrypt.hash(password, user.salt);
+      if (user && hashedPassword === user.password) {
+        const payload = { username: user.username, id: user.id };
+        return {
+          user: {
+            username: user.username,
+            email: user.email,
+            id: user.id,
+          },
+          access_token: this.jwtService.sign(payload),
+        };
+      }
+    } catch {
       throw new BadRequestException('Invalid credentials');
     }
   }

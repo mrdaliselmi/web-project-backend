@@ -1,27 +1,48 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsObject, IsOptional } from 'class-validator';
 
 export class CreateProductDto {
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   price: number;
 
-  @IsNotEmpty()
-  imageUrl: string;
+  @IsOptional()
+  images: string[];
 
-  @IsNotEmpty()
+  @IsOptional()
   stock: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   category: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   brand: string;
 
-  @IsNotEmpty()
-  color: string;
+  @IsOptional()
+  colors: string[];
+
+  @IsOptional()
+  originalPrice: number;
+
+  @IsOptional()
+  rating: number;
+
+  @IsObject()
+  specs: {
+    type: string;
+    numberOfKeys: number;
+    keyCaps: string;
+    illumination: string;
+    buttons: number;
+    resolution: string;
+    headSupport: string;
+    size: string;
+    upholstery: string;
+    material: string;
+    connectivity: string;
+  };
 }

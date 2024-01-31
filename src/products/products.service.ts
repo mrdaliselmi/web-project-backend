@@ -17,20 +17,50 @@ export class ProductsService {
     private readonly cpRepository: Repository<CustomerProduct>,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
-    return await this.productRepository.save(createProductDto);
+  async create(createProductDtos: CreateProductDto[]) {
+    const productsToSave = [];
+    for (const createProductDto of createProductDtos) {
+      const colors = JSON.stringify(createProductDto.colors);
+      const images = JSON.stringify(createProductDto.images);
+
+      const product = this.productRepository.create({
+        ...createProductDto,
+        colors,
+        images,
+      });
+
+      productsToSave.push(product);
+    }
+
+    await this.productRepository.save(productsToSave);
   }
 
   async findAll(params: PaginationParams) {
     const { limit, skip } = params;
-    return await this.productRepository.findAndCount({
+
+    const [products, totalCount] = await this.productRepository.findAndCount({
       take: limit,
       skip: skip * limit,
     });
+
+    products.forEach((product) => {
+      product.images = JSON.parse(product.images);
+      product.colors = JSON.parse(product.colors);
+    });
+
+    return { data: { products, totalCount } };
   }
 
   async findOne(id: number) {
-    return await this.productRepository.find({ where: { id: id } });
+    const product = await this.productRepository.findOne({ where: { id: id } });
+
+    if (product) {
+      // Parse the JSON strings back to arrays for images and colors
+      product.images = JSON.parse(product.images);
+      product.colors = JSON.parse(product.colors);
+    }
+
+    return { data: product };
   }
 
   async search(searchParams: ProductSearchParams) {
@@ -95,9 +125,9 @@ export class ProductsService {
     return await queryBuilder.getManyAndCount();
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    return await this.productRepository.update(id, updateProductDto);
-  }
+  // async update(id: number, updateProductDto: UpdateProductDto) {
+  //   return await this.productRepository.update(id, updateProductDto);
+  // }
 
   async remove(id: number) {
     return await this.productRepository.softDelete(id);
@@ -128,10 +158,11 @@ export class ProductsService {
       .select('ROUND(AVG(rating))', 'avg')
       .getRawOne();
     // update average rating
-    return await this.productRepository.update(id, { rating: average.avg });
+    await this.productRepository.update(id, { rating: average.avg });
+    return { message: 'Rating submitted successfully' };
   }
 
-  async addToWishList(id: number, user: any, res) {
+  async addToWishList(id: number, user: any) {
     const currentEntry = await this.cpRepository.findOne({
       where: { user: { id: user.id }, product: { id: id } },
     });
@@ -144,6 +175,16 @@ export class ProductsService {
         wishList: true,
       });
     }
-    return res.status(200).json({ message: 'Success!' });
+    return { message: 'Added to Wishlist Successfully!' };
+  }
+  async getWishlist(user: any) {
+    const products = await this.cpRepository
+      .createQueryBuilder('cp')
+      .innerJoinAndSelect('cp.product', 'product') // Join with the Product entity
+      .where('cp.user.id = :userId', { userId: user.id })
+      .andWhere('cp.wishlisted = 1')
+      .getMany();
+
+    return { data: products };
   }
 }
