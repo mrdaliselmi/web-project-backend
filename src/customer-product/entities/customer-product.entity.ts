@@ -5,7 +5,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class CustomerProduct extends GenericEntity {
-  @Column()
+  @Column({ nullable: true })
   rating: number;
 
   @Column({ default: false })

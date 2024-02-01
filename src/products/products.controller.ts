@@ -32,6 +32,16 @@ export class ProductsController {
     return this.productsService.findAll(paginationParams);
   }
 
+  @Get('brands')
+  brands() {
+    return this.productsService.getBrands();
+  }
+
+  @Get('categories')
+  categories() {
+    return this.productsService.getCategories();
+  }
+
 //   @Get('advanced-search')
 //   search(@Body() searchParams: ProductSearchParams) {
 //     return this.productsService.search(searchParams);
@@ -62,15 +72,15 @@ export class ProductsController {
 //     return this.productsService.rateProduct(+id, rate.rating, user);
 //   }
 
-//   @UseGuards(JwtAuthGuard)
-//   @Post('/wishlist/:id')
-//   wishlist(@Param('id') id: string, @User() user: any, @Res() res: Response) {
-//     return this.productsService.addToWishList(+id, user, res);
-//   }
+  @UseGuards(JwtAuthGuard)
+  @Post('/wishlist/:id')
+  wishlist(@Param('id') id: string, @User() user: any) {
+    return this.productsService.addToWishList(+id, user);
+  }
 
-//   @UseGuards(JwtAuthGuard)
-//   @Get('/wishlist')
-//   getWishlist(@User() user: any) {
-//     return this.productsService.getWishlist(user);
-//   }
+  @UseGuards(JwtAuthGuard)
+  @Get('/wishlist')
+  getWishlist(@User() user: any) {
+    return this.productsService.getWishlist(user);
+  }
 }
