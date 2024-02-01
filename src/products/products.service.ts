@@ -137,6 +137,26 @@ export class ProductsService {
     return { data: { products: results, totalCount } };
   }
 
+  async advancedSearch(searchParams: ProductSearchParams) {
+    const { query } = searchParams;
+    const queryBuilder = this.productRepository.createQueryBuilder('product');
+
+    // Filtering
+    if (query) {
+      queryBuilder.where(
+        '(product.name LIKE :query OR product.description LIKE :query)',
+        { query: `%${query}%` },
+      );
+    }
+
+    let [results, totalCount] = await queryBuilder.getManyAndCount();
+    results.forEach((product) => {
+      product.images = JSON.parse(product.images);
+      product.colors = JSON.parse(product.colors);
+    });
+    return results;
+  }
+
   async update(updateProductDtos: UpdateProductDto[]) {
     const productsToUpdate = [];
     for (const createProductDto of updateProductDtos) {
@@ -237,3 +257,4 @@ export class ProductsService {
     return { data: [...categories] };
   }
 }
+
