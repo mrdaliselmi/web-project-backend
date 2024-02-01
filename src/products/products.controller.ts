@@ -40,7 +40,7 @@ export class ProductsController {
     return this.productsService.getCategories();
   }
 
-  @Get('search')
+  @Post('search')
   search(@Body() searchParams: ProductSearchParams) {
     return this.productsService.search(searchParams);
   }
