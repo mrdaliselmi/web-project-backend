@@ -66,13 +66,13 @@ export class ProductsService {
   async search(searchParams: ProductSearchParams) {
     const {
       query,
-      brand,
-      category,
+      brands,
+      categories,
       minPrice,
       maxPrice,
       minRating,
       maxRating,
-      color,
+      colors,
       stock,
       sort,
       order,
@@ -88,11 +88,13 @@ export class ProductsService {
         { query: `%${query}%` },
       );
     }
-    if (brand && brand.length > 0) {
-      queryBuilder.andWhere('product.brand IN (:...brand)', { brand });
+    if (brands && brands.length > 0) {
+      queryBuilder.andWhere('product.brand IN (:...brands)', { brands });
     }
-    if (category && category.length > 0) {
-      queryBuilder.andWhere('product.category IN (:...category)', { category });
+    if (categories && categories.length > 0) {
+      queryBuilder.andWhere('product.category IN (:...categories)', {
+        categories,
+      });
     }
     if (minPrice !== undefined) {
       queryBuilder.andWhere('product.price >= :minPrice', { minPrice });
@@ -105,9 +107,6 @@ export class ProductsService {
     }
     if (maxRating !== undefined) {
       queryBuilder.andWhere('product.rating <= :maxRating', { maxRating });
-    }
-    if (color) {
-      queryBuilder.andWhere('product.color = :color', { color });
     }
     if (stock !== undefined) {
       if (stock) queryBuilder.andWhere('product.stock > 0');
@@ -122,12 +121,41 @@ export class ProductsService {
     // Pagination
     queryBuilder.take(limit).skip(skip * limit);
 
-    return await queryBuilder.getManyAndCount();
+    let [results, totalCount] = await queryBuilder.getManyAndCount();
+    results.forEach((product) => {
+      product.images = JSON.parse(product.images);
+      product.colors = JSON.parse(product.colors);
+    });
+    if (colors && colors.length > 0) {
+      results = results.filter((result) => {
+        if (Array.isArray(result.colors)) {
+          return result.colors.some((color) => colors.includes(color));
+        }
+      });
+      totalCount = results.length;
+    }
+    return { data: { products: results, totalCount } };
   }
 
-  // async update(id: number, updateProductDto: UpdateProductDto) {
-  //   return await this.productRepository.update(id, updateProductDto);
-  // }
+  async update(updateProductDtos: UpdateProductDto[]) {
+    const productsToUpdate = [];
+    for (const createProductDto of updateProductDtos) {
+      const colors = JSON.stringify(createProductDto.colors);
+      const images = JSON.stringify(createProductDto.images);
+
+      const product = this.productRepository.create({
+        ...createProductDto,
+        colors,
+        images,
+      });
+
+      productsToUpdate.push(product);
+    }
+    for (const product of productsToUpdate) {
+      await this.productRepository.update(product.id, product);
+    }
+    return { message: 'Products updated successfully!' };
+  }
 
   async remove(id: number) {
     return await this.productRepository.softDelete(id);
@@ -177,6 +205,7 @@ export class ProductsService {
     }
     return { message: 'Added to Wishlist Successfully!' };
   }
+
   async getWishlist(user: any) {
     const products = await this.cpRepository
       .createQueryBuilder('cp')
