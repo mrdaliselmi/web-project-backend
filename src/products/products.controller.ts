@@ -45,6 +45,13 @@ export class ProductsController {
     return this.productsService.search(searchParams);
   }
 
+  @Get('advanced-search')
+  advSearch(@Query() searchParams: ProductSearchParams) {
+    return this.productsService.advancedSearch(searchParams);
+  }
+
+
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
