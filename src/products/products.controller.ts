@@ -77,6 +77,12 @@ export class ProductsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete('/wishlist/:id')
+  removeFromWishlist(@Param('id') id: string, @User() user: any) {
+    return this.productsService.removeFromWishlist(+id, user);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/wishlist')
   getWishlist(@User() user: any) {
     return this.productsService.getWishlist(user);

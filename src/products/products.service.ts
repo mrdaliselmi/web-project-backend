@@ -206,6 +206,16 @@ export class ProductsService {
     return { message: 'Added to Wishlist Successfully!' };
   }
 
+  async removeFromWishlist(id: number, user: any) {
+    const currentEntry = await this.cpRepository.findOne({
+      where: { user: { id: user.id }, product: { id: id } },
+    });
+    if (currentEntry) {
+      await this.cpRepository.update(currentEntry.id, { wishlisted: false });
+    }
+    return { message: 'Removed from wishlist successfully!' };
+  }
+
   async getWishlist(user: any) {
     const products = await this.cpRepository
       .createQueryBuilder('cp')
