@@ -232,8 +232,9 @@ export class ProductsService {
     });
     if (currentEntry) {
       await this.cpRepository.update(currentEntry.id, { wishlisted: false });
+      return { message: 'Removed from wishlist successfully!' };
     }
-    return { message: 'Removed from wishlist successfully!' };
+    return { message: 'Product not found in wishlist!' };
   }
 
   async getWishlist(user: any) {
