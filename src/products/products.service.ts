@@ -210,52 +210,6 @@ export class ProductsService {
     return { message: 'Rating submitted successfully' };
   }
 
-  async addToWishList(id: number, user: any) {
-    const currentEntry = await this.cpRepository.findOne({
-      where: { user: { id: user.id }, product: { id: id } },
-    });
-    if (currentEntry) {
-      await this.cpRepository.update(currentEntry.id, { wishlisted: true });
-    } else {
-      await this.cpRepository.save({
-        product: { id: id },
-        user: { id: user.id },
-        wishlisted: true,
-      });
-    }
-    return { message: 'Added to Wishlist Successfully!' };
-  }
-
-  async removeFromWishlist(id: number, user: any) {
-    const currentEntry = await this.cpRepository.findOne({
-      where: { user: { id: user.id }, product: { id: id } },
-    });
-    if (currentEntry) {
-      await this.cpRepository.update(currentEntry.id, { wishlisted: false });
-      return { message: 'Removed from wishlist successfully!' };
-    }
-    return { message: 'Product not found in wishlist!' };
-  }
-
-  async getWishlist(user: any) {
-    const products = await this.cpRepository
-      .createQueryBuilder('cp')
-      .innerJoinAndSelect('cp.product', 'product')
-      .where('cp.user.id = :userId', { userId: user.id })
-      .andWhere('cp.wishlisted = 1')
-      .getMany();
-
-    const results = await products.map((product) => {
-      console.log(product);
-      return product.product;
-    });
-    results.forEach((result) => {
-      result.images = JSON.parse(result.images);
-      result.colors = JSON.parse(result.colors);
-    });
-    return { data: results };
-  }
-
   async getBrands() {
     const products = await this.productRepository.find();
     const brands = new Set(products.map((product) => product.brand));
@@ -268,4 +222,3 @@ export class ProductsService {
     return { data: [...categories] };
   }
 }
-
