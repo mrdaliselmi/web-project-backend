@@ -7,6 +7,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { PaginationParams } from 'src/common/pagination-params.interface';
 import { CustomerProduct } from 'src/customer-product/entities/customer-product.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ProductsService {
@@ -15,6 +16,7 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(CustomerProduct)
     private readonly cpRepository: Repository<CustomerProduct>,
+    private readonly userService: UserService,
   ) {}
 
   async create(createProductDtos: CreateProductDto[]) {
@@ -220,5 +222,17 @@ export class ProductsService {
     const products = await this.productRepository.find();
     const categories = new Set(products.map((product) => product.category));
     return { data: [...categories] };
+  }
+
+  async findAllForUser(paginationParams: PaginationParams, user: any) {
+    const {
+      data: { products, totalCount },
+    } = await this.findAll(paginationParams);
+    const { data: wishlist } = await this.userService.getWishlist(user);
+    const ids = new Set(wishlist.map((product) => product.id));
+    products.forEach((product) => {
+      product.wishlist = ids.has(product.id);
+    });
+    return { data: { products, totalCount } };
   }
 }

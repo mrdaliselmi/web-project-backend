@@ -26,8 +26,10 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query() paginationParams: PaginationParams) {
-    return this.productsService.findAll(paginationParams);
+  findAll(@Query() paginationParams: PaginationParams, @User() user) {
+    if (user)
+      return this.productsService.findAllForUser(paginationParams, user);
+    else return this.productsService.findAll(paginationParams);
   }
 
   @Get('brands')

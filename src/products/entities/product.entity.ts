@@ -35,6 +35,9 @@ export class Product extends GenericEntity {
   @Column({ nullable: true })
   rating: number;
 
+  @Column({ nullable: true, default: false })
+  wishlist: boolean;
+
   @Column('simple-json', { nullable: true })
   specs: {
     type: string | null;
