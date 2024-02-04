@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -14,6 +14,7 @@ import { CustomerProduct } from './customer-product/entities/customer-product.en
 import { Order } from './orders/entities/order.entity';
 import { OrderProductModule } from './order-product/order-product.module';
 import { OrderProduct } from './order-product/entities/order-product.entity';
+import { AuthenticationMiddleware } from './middlewares/authentication.middleware';
 
 @Module({
   imports: [
@@ -44,4 +45,10 @@ import { OrderProduct } from './order-product/entities/order-product.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthenticationMiddleware)
+      .forRoutes({ path: 'products', method: RequestMethod.GET });
+  }
+}

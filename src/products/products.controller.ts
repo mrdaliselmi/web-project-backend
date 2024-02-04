@@ -26,8 +26,10 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query() paginationParams: PaginationParams) {
-    return this.productsService.findAll(paginationParams);
+  findAll(@Query() paginationParams: PaginationParams, @User() user) {
+    if (user)
+      return this.productsService.findAllForUser(paginationParams, user);
+    else return this.productsService.findAll(paginationParams);
   }
 
   @Get('brands')
@@ -49,8 +51,6 @@ export class ProductsController {
   advSearch(@Query() searchParams: ProductSearchParams) {
     return this.productsService.advancedSearch(searchParams);
   }
-
-
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -75,17 +75,5 @@ export class ProductsController {
     @User() user: any,
   ) {
     return this.productsService.rateProduct(+id, rate.rating, user);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('/wishlist/:id')
-  wishlist(@Param('id') id: string, @User() user: any) {
-    return this.productsService.addToWishList(+id, user);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/wishlist')
-  getWishlist(@User() user: any) {
-    return this.productsService.getWishlist(user);
   }
 }

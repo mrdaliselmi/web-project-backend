@@ -16,9 +16,14 @@ export class Order extends GenericEntity {
   })
   status: OrderStatus;
 
+  @Column({ nullable: true })
+  total: number;
+
   @ManyToOne(() => UserEntity, (user) => user.id)
   user: UserEntity;
 
-  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.id)
+  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.id, {
+    cascade: true,
+  })
   orderProduct: OrderProduct[];
 }

@@ -7,6 +7,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { PaginationParams } from 'src/common/pagination-params.interface';
 import { CustomerProduct } from 'src/customer-product/entities/customer-product.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ProductsService {
@@ -15,6 +16,7 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(CustomerProduct)
     private readonly cpRepository: Repository<CustomerProduct>,
+    private readonly userService: UserService,
   ) {}
 
   async create(createProductDtos: CreateProductDto[]) {
@@ -210,41 +212,6 @@ export class ProductsService {
     return { message: 'Rating submitted successfully' };
   }
 
-  async addToWishList(id: number, user: any) {
-    const currentEntry = await this.cpRepository.findOne({
-      where: { user: { id: user.id }, product: { id: id } },
-    });
-    if (currentEntry) {
-      await this.cpRepository.update(currentEntry.id, { wishlisted: true });
-    } else {
-      await this.cpRepository.save({
-        product: { id: id },
-        user: { id: user.id },
-        wishlisted: true,
-      });
-    }
-    return { message: 'Added to Wishlist Successfully!' };
-  }
-
-  async getWishlist(user: any) {
-    const products = await this.cpRepository
-      .createQueryBuilder('cp')
-      .innerJoinAndSelect('cp.product', 'product')
-      .where('cp.user.id = :userId', { userId: user.id })
-      .andWhere('cp.wishlisted = 1')
-      .getMany();
-
-    const results = await products.map((product) => {
-      console.log(product);
-      return product.product;
-    });
-    results.forEach((result) => {
-      result.images = JSON.parse(result.images);
-      result.colors = JSON.parse(result.colors);
-    });
-    return { data: results };
-  }
-
   async getBrands() {
     const products = await this.productRepository.find();
     const brands = new Set(products.map((product) => product.brand));
@@ -256,5 +223,16 @@ export class ProductsService {
     const categories = new Set(products.map((product) => product.category));
     return { data: [...categories] };
   }
-}
 
+  async findAllForUser(paginationParams: PaginationParams, user: any) {
+    const {
+      data: { products, totalCount },
+    } = await this.findAll(paginationParams);
+    const { data: wishlist } = await this.userService.getWishlist(user);
+    const ids = new Set(wishlist.map((product) => product.id));
+    products.forEach((product) => {
+      product.wishlist = ids.has(product.id);
+    });
+    return { data: { products, totalCount } };
+  }
+}
