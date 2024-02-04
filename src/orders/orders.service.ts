@@ -23,7 +23,14 @@ export class OrdersService {
   async create(createOrderDto: CreateOrderDto, user) {
     const currentuser = await this.userService.findOne(user.id);
     const order = this.orderRepository.create({
-      deliveryAddress: createOrderDto.deliveryAddress,
+      firstname: createOrderDto.firstname,
+      lastname: createOrderDto.lastname,
+      streetAddress: createOrderDto.streetAddress,
+      apt: createOrderDto.apt,
+      city: createOrderDto.city,
+      state: createOrderDto.state,
+      zip: createOrderDto.zip,
+      phone: createOrderDto.phone,
       user: currentuser,
     });
     const orderItems = await createOrderDto.Products.map((product) => ({

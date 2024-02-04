@@ -7,7 +7,28 @@ import { OrderProduct } from 'src/order-product/entities/order-product.entity';
 @Entity()
 export class Order extends GenericEntity {
   @Column()
-  deliveryAddress: string;
+  streetAddress: string;
+
+  @Column()
+  apt: string;
+
+  @Column()
+  city: string;
+
+  @Column()
+  state: string;
+
+  @Column()
+  zip: number;
+
+  @Column()
+  phone: string;
+
+  @Column()
+  firstname: string;
+
+  @Column()
+  lastname: string;
 
   @Column({
     type: 'enum',
