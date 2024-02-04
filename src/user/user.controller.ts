@@ -31,4 +31,11 @@ export class UserController {
   removeFromWishlist(@Param('id') id: string, @User() user) {
     return this.userService.removeFromWishlist(+id, user);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  profile(@User() user) {
+    return this.userService.getProfile(user);
+  }
+
 }

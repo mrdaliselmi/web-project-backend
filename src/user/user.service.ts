@@ -83,4 +83,13 @@ export class UserService {
     });
     return { data: results };
   }
+
+  async getProfile(user: any) {
+    const currentUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+    return {
+      data: { email: currentUser.email, username: currentUser.username },
+    };
+  }
 }
