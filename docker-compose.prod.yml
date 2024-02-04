@@ -1,0 +1,30 @@
+services:
+  backend-api-prod:
+    image: backend-api
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - ./src:/usr/src/app/src
+    # depends_on:
+    #   - mysql
+    # networks:
+    #   - backend-network
+  mysql_db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: store
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_TCP_PORT: 3306
+    ports:
+      - "3306:3306"
+    # networks:
+    #   - backend-network
