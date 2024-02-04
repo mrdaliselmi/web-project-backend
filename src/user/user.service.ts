@@ -44,6 +44,9 @@ export class UserService {
       where: { user: { id: user.id }, product: { id: id } },
     });
     if (currentEntry) {
+      if (currentEntry.wishlisted) {
+        return { message: 'Already in Wishlist!' };
+      }
       await this.cpRepository.update(currentEntry.id, { wishlisted: true });
     } else {
       await this.cpRepository.save({

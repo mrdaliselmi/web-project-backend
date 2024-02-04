@@ -37,5 +37,4 @@ export class UserController {
   profile(@User() user) {
     return this.userService.getProfile(user);
   }
-
 }
