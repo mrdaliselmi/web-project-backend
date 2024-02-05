@@ -100,11 +100,12 @@ export class UserService {
   }
 
   async update(user, updateUser: UpdateUserDto) {
-  try {
-
-
+    const existingUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
     if (updateUser.email && updateUser.email !== user.email) {
       const existingUser = await this.userRepository.findOne({where:{ email: updateUser.email }});
+
       if (existingUser && existingUser.id !== user.id) {
         throw new ConflictException('Email already exists');
       }
@@ -118,17 +119,13 @@ export class UserService {
       user.username = updateUser.username;
     }
     if (updateUser.password ) {
+      
+      user.salt = existingUser.salt;
       user.password = await bcrypt.hash(updateUser.password, user.salt);
-
     }
     this.userRepository.save(user);
     return {'message' : 'User updated successfully!'};}
-    catch(e){
-      throw new ConflictException(e);
-    }
 
-
-  }
 
  async remove(user) {
     await this.userRepository.softDelete(user.id);
