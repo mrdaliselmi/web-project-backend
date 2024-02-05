@@ -10,6 +10,11 @@ async function bootstrap() {
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
     credentials: true,
   });
-  await app.listen(3000);
+  const PORT = configService.get('PORT') || 3000;
+  await app.listen(PORT, () => {
+    console.log(
+      `API listening in MODE: ${configService.get('NODE_ENV')} on PORT: ${PORT}`,
+    );
+  });
 }
 bootstrap();
