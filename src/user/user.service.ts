@@ -23,7 +23,6 @@ export class UserService {
     }
   }
 
-
   async findOne(id: number): Promise<UserEntity> {
     return this.userRepository.findOne({ where: { id: id } });
   }
@@ -104,7 +103,9 @@ export class UserService {
       where: { id: user.id },
     });
     if (updateUser.email && updateUser.email !== user.email) {
-      const existingUser = await this.userRepository.findOne({where:{ email: updateUser.email }});
+      const existingUser = await this.userRepository.findOne({
+        where: { email: updateUser.email },
+      });
 
       if (existingUser && existingUser.id !== user.id) {
         throw new ConflictException('Email already exists');
@@ -112,24 +113,24 @@ export class UserService {
       user.email = updateUser.email;
     }
     if (updateUser.username && updateUser.username !== user.username) {
-      const existingUser = await this.userRepository.findOne({where:{ username: updateUser.username}});
+      const existingUser = await this.userRepository.findOne({
+        where: { username: updateUser.username },
+      });
       if (existingUser && existingUser.id !== user.id) {
         throw new ConflictException('Username already exists');
       }
       user.username = updateUser.username;
     }
-    if (updateUser.password ) {
-      
+    if (updateUser.password) {
       user.salt = existingUser.salt;
       user.password = await bcrypt.hash(updateUser.password, user.salt);
     }
     this.userRepository.save(user);
-    return {'message' : 'User updated successfully!'};}
+    return { message: 'User updated successfully!' };
+  }
 
-
- async remove(user) {
+  async remove(user) {
     await this.userRepository.softDelete(user.id);
     return { message: 'User removed' };
-
   }
 }

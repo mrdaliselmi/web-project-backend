@@ -151,7 +151,7 @@ export class ProductsService {
       );
     }
 
-    let [results, totalCount] = await queryBuilder.getManyAndCount();
+    const [results, totalCount] = await queryBuilder.getManyAndCount();
     results.forEach((product) => {
       product.images = JSON.parse(product.images);
       product.colors = JSON.parse(product.colors);
