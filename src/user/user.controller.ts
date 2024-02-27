@@ -3,7 +3,8 @@ import {
   Controller,
   Delete,
   Get,
-  Param, Patch,
+  Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -32,17 +33,17 @@ export class UserController {
   removeFromWishlist(@Param('id') id: string, @User() user) {
     return this.userService.removeFromWishlist(+id, user);
   }
-   @UseGuards(JwtAuthGuard)
-   @Patch()
-   update(@User() user, @Body() updateUserDto: UpdateUserDto) {
-     return this.userService.update(user, updateUserDto);
-   }
+  @UseGuards(JwtAuthGuard)
+  @Patch()
+  update(@User() user, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(user, updateUserDto);
+  }
 
-   @UseGuards(JwtAuthGuard)
-    @Delete()
-    remove(@User() user) {
-      return this.userService.remove(user);
-    }
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  remove(@User() user) {
+    return this.userService.remove(user);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')

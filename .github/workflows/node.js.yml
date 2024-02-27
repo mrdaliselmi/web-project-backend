@@ -27,7 +27,18 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Lint and format code
+        run: |
+          npm run lint
+          npm run format
       - name: Build NestJS project
         run: npm run build --if-present
-      # - name: Run tests
-      #   run: npm test
+      - name: Run tests
+        run: npm test
+      - name: Push to Docker
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: mrdali/e-commerce-back
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
